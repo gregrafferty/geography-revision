@@ -38,15 +38,20 @@
 
   function getSettings(topic) {
     return Object.assign(
-      { groups: Object.keys(topic.groups || {}).filter(g => !(topic.defaultOff || []).includes(g)), length: 10 },
+      {
+        groups: Object.keys(topic.groups || {}).filter(g => !(topic.defaultOff || []).includes(g)),
+        regions: Object.keys(topic.regions || {}),
+        length: 10
+      },
       store.get(settingsKey(topic), {})
     );
   }
   function saveSettings(topic, s) { store.set(settingsKey(topic), s); }
 
   function poolFor(topic, settings) {
-    if (!topic.groups) return topic.items.slice();
-    return topic.items.filter(i => !i.group || settings.groups.includes(i.group));
+    return topic.items.filter(i =>
+      (!topic.groups || !i.group || settings.groups.includes(i.group)) &&
+      (!topic.regions || !i.region || settings.regions.includes(i.region)));
   }
 
   /* ---------- Helpers ---------- */
@@ -154,6 +159,8 @@
       const weak = pool.filter(i => { const m = mastery(stats[i.q]); return m === 1 || m === 2; }).length;
       const groupChips = topic.groups ? Object.entries(topic.groups).map(([g, label]) =>
         `<button class="chip" data-group="${g}" aria-pressed="${settings.groups.includes(g)}">${esc(label)}</button>`).join("") : "";
+      const regionChips = topic.regions ? Object.entries(topic.regions).map(([r, label]) =>
+        `<button class="chip" data-region="${r}" aria-pressed="${settings.regions.includes(r)}">${esc(label)}</button>`).join("") : "";
       const lengthChips = [10, 20, 0].map(n =>
         `<button class="chip" data-len="${n}" aria-pressed="${settings.length === n}">${n ? n + " questions" : "All " + pool.length}</button>`).join("");
 
@@ -171,7 +178,9 @@
           <div class="meter"><span style="width:${pool.length ? mastered / pool.length * 100 : 0}%"></span></div>
           <button class="link-btn" id="progressBtn">See all progress ›</button>
         </div>
-        ${groupChips ? `<h3>Regions to include</h3><div class="chips">${groupChips}</div>` : ""}
+        ${groupChips ? `<h3>${esc(topic.groupsLabel || "Regions to include")}</h3><div class="chips">${groupChips}</div>` : ""}
+        ${regionChips ? `<h3>${esc(topic.regionsLabel || "Continents")}</h3><div class="chips">${regionChips}</div>` : ""}
+        ${!pool.length ? `<p class="feedback close">No questions match these choices. Switch on more chips above.</p>` : ""}
         <h3>Quiz length</h3><div class="chips">${lengthChips}</div>
         <h3>Choose a mode</h3>
         <div class="list">
@@ -186,6 +195,11 @@
       app.querySelectorAll("[data-group]").forEach(b => b.addEventListener("click", () => {
         const g = b.dataset.group;
         settings.groups = settings.groups.includes(g) ? settings.groups.filter(x => x !== g) : [...settings.groups, g];
+        saveSettings(topic, settings); draw();
+      }));
+      app.querySelectorAll("[data-region]").forEach(b => b.addEventListener("click", () => {
+        const r = b.dataset.region;
+        settings.regions = settings.regions.includes(r) ? settings.regions.filter(x => x !== r) : [...settings.regions, r];
         saveSettings(topic, settings); draw();
       }));
       app.querySelectorAll("[data-len]").forEach(b => b.addEventListener("click", () => {
