@@ -38,7 +38,7 @@
 
   function getSettings(topic) {
     return Object.assign(
-      { groups: Object.keys(topic.groups || {}).filter(g => g !== "uk"), length: 10 },
+      { groups: Object.keys(topic.groups || {}).filter(g => !(topic.defaultOff || []).includes(g)), length: 10 },
       store.get(settingsKey(topic), {})
     );
   }
@@ -56,8 +56,10 @@
     for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
     return a;
   };
+  // Ignore accents, case, punctuation and filler words, so "the River Thames" matches "Thames".
+  const FILLER = new Set(["the", "river", "mount", "mt", "mountain", "mountains"]);
   const normalise = (s) => String(s).normalize("NFD").replace(/[̀-ͯ]/g, "")
-    .toLowerCase().replace(/^the\s+/, "").replace(/[^a-z]/g, "");
+    .toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter(w => w && !FILLER.has(w)).join("");
 
   function levenshtein(a, b) {
     const dp = Array.from({ length: b.length + 1 }, (_, i) => i);
@@ -85,6 +87,8 @@
   }
 
   const fill = (tpl, item) => tpl.replace("{q}", item.q).replace("{a}", item.a);
+  const askText = (topic, item) => item.ask || fill(topic.forward, item);
+  const factText = (topic, item) => item.fact || (topic.fact ? fill(topic.fact, item) : "");
 
   /* ---------- Navigation ---------- */
   let current = null; // { name, params }
@@ -155,11 +159,11 @@
 
       const modes = [
         { m: "learn", e: "🃏", t: "Flashcards", s: "Flip cards to learn them first" },
-        { m: "mc", e: "✅", t: "Multiple choice", s: "Pick the capital from four options" },
-        { m: "mc-rev", e: "🔁", t: "Reverse multiple choice", s: "Given the capital, pick the country" },
+        { m: "mc", e: "✅", t: "Multiple choice", s: topic.mcHint || "Pick the right answer from four options" },
+        topic.reverse && { m: "mc-rev", e: "🔁", t: "Reverse multiple choice", s: topic.reverseHint || "Work backwards from the answer" },
         { m: "type", e: "⌨️", t: "Type the answer", s: "Exam style: spelling counts" },
         { m: "weak", e: "🎯", t: "Practise weak spots", s: weak ? `${weak} to work on` : "Do a quiz first to find these", disabled: !weak }
-      ];
+      ].filter(Boolean);
 
       app.innerHTML = `
         <div class="card">
@@ -225,7 +229,8 @@
     const ask = () => {
       if (index >= questions.length) return finish();
       const item = questions[index];
-      const qText = reverse ? fill(topic.reverse, item) : fill(topic.forward, item);
+      const qText = reverse ? fill(topic.reverse, item) : askText(topic, item);
+      const fact = factText(topic, item);
       const header = `
         <div class="progress-line"><span>Question ${index + 1} of ${questions.length}</span><span>Score ${score}</span></div>
         <div class="meter"><span style="width:${index / questions.length * 100}%"></span></div>
@@ -251,9 +256,10 @@
           log.push({ item, ok, given });
           app.querySelector("#f").remove();
           const fb = app.querySelector("#fb");
-          const msg = result === "exact" ? `<div class="feedback good">✓ Correct: ${esc(item.a)}</div>`
-            : result === "close" ? `<div class="feedback close">≈ Nearly! Check the spelling: <strong>${esc(item.a)}</strong><small>You wrote “${esc(given)}”. Counted as correct, but spelling matters in the exam.</small></div>`
-            : `<div class="feedback bad">✗ The answer is <strong>${esc(item.a)}</strong>${given ? `<small>You wrote “${esc(given)}”.</small>` : ""}</div>`;
+          const factLine = item.fact ? `<small>${esc(item.fact)}</small>` : "";
+          const msg = result === "exact" ? `<div class="feedback good">✓ Correct: ${esc(item.a)}${factLine}</div>`
+            : result === "close" ? `<div class="feedback close">≈ Nearly! Check the spelling: <strong>${esc(item.a)}</strong><small>You wrote “${esc(given)}”. Counted as correct, but spelling matters in the exam.</small>${factLine}</div>`
+            : `<div class="feedback bad">✗ The answer is <strong>${esc(item.a)}</strong>${given ? `<small>You wrote “${esc(given)}”.</small>` : ""}${factLine}</div>`;
           fb.innerHTML = `${msg}<div class="actions"><button class="btn block" id="next">${index + 1 < questions.length ? "Next question" : "See results"}</button></div>`;
           const next = fb.querySelector("#next");
           next.focus();
@@ -272,8 +278,9 @@
       const pool = poolFor(topic, settings);
       const answerOf = (i) => reverse ? i.q : i.a;
       const correctAnswer = answerOf(item);
-      // Distractors must have a different capital (e.g. England and the UK are both London).
-      const candidates = topic.items.filter(i => i.a !== item.a && answerOf(i) !== correctAnswer);
+      // Distractors must have a different answer (e.g. England and the UK are both London)
+      // and be the same kind of thing (a river for a river question, a peak for a peak question).
+      const candidates = topic.items.filter(i => i.a !== item.a && answerOf(i) !== correctAnswer && i.kind === item.kind);
       const sameGroup = shuffle(candidates.filter(i => i.group === item.group && pool.includes(i)));
       const others = shuffle(candidates.filter(i => !sameGroup.includes(i)));
       const seen = new Set([correctAnswer]);
@@ -300,8 +307,7 @@
           else if (b === btn) b.classList.add("wrong");
         });
         const fb = app.querySelector("#fb");
-        const fact = `${esc(item.a)} is the capital of ${esc(item.q)}.`;
-        fb.innerHTML = `<div class="feedback ${ok ? "good" : "bad"}">${ok ? "✓ Correct!" : "✗ Not quite."} <small>${fact}</small></div>
+        fb.innerHTML = `<div class="feedback ${ok ? "good" : "bad"}">${ok ? "✓ Correct!" : `✗ Not quite. The answer is ${esc(correctAnswer)}.`} ${fact ? `<small>${esc(fact)}</small>` : ""}</div>
           <div class="actions"><button class="btn block" id="next">${index + 1 < questions.length ? "Next question" : "See results"}</button></div>`;
         const next = fb.querySelector("#next");
         next.focus();
@@ -374,12 +380,14 @@
           <div class="flash-inner">
             <div class="flash-face front">
               ${item.flag ? `<div class="flag" aria-hidden="true">${item.flag}</div>` : ""}
-              <div class="big">${esc(item.q)}</div>
-              <div class="hint">What's the capital?</div>
+              ${item.ask
+                ? `<div class="big medium">${esc(item.ask)}</div>`
+                : `<div class="big">${esc(item.q)}</div><div class="hint">${esc(topic.flashHint || "")}</div>`}
             </div>
             <div class="flash-face back">
-              <div class="hint" style="margin:0 0 8px">The capital of ${esc(item.q)} is</div>
+              ${topic.flashBack && !item.ask ? `<div class="hint" style="margin:0 0 8px">${esc(fill(topic.flashBack, item))}</div>` : ""}
               <div class="big">${esc(item.a)}</div>
+              ${item.fact ? `<div class="hint">${esc(item.fact)}</div>` : ""}
             </div>
           </div>
         </div>

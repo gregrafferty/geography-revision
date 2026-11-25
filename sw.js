@@ -1,5 +1,5 @@
 // Bump this version whenever you change any file, so phones pick up the update.
-const CACHE = "geo-revision-v1";
+const CACHE = "geo-revision-v2";
 const ASSETS = [
   "./",
   "index.html",

@@ -1,6 +1,11 @@
 # Geography Revision
 
-A small, installable web app (PWA) for revising geography for a mock exam. It starts with the capital cities of Europe. It has no build step and no dependencies, and it works offline once it has loaded.
+A small, installable web app (PWA) for revising geography for a mock exam. Topics so far:
+
+- **European capital cities**
+- **World rivers & mountains**: the longest rivers, which rivers flow through which cities, the major mountain ranges, the highest peak on each continent, and UK rivers and mountains
+
+ It has no build step and no dependencies, and it works offline once it has loaded.
 
 ## Modes
 
@@ -49,4 +54,4 @@ Whenever you change any file, increase the version in `sw.js` (for example `geo-
 
 ## Adding more topics
 
-Topics live in [`data/topics.js`](data/topics.js). To add one (rivers, mountain ranges, other continents' capitals and so on), add another object to the `TOPICS` array with the same shape: a `forward` question template, a `reverse` template, optional `groups`, and `items` of `{ q, a, alt }`. Every mode works with it automatically. Add the new file to the `ASSETS` list in `sw.js` if you put it in a separate file.
+Topics live in [`data/topics.js`](data/topics.js). To add one (rivers, mountain ranges, other continents' capitals and so on), add another object to the `TOPICS` array with the same shape: a `forward` question template, an optional `reverse` template, optional `groups`, and `items` of `{ q, a, alt }`. Items can also have their own question (`ask`), a fact shown after answering (`fact`), and a `kind` so multiple-choice wrong answers stay the same kind of thing. The comment at the top of the file explains each field. Every mode works with a new topic automatically. Add the new file to the `ASSETS` list in `sw.js` if you put it in a separate file.
