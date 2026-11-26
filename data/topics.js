@@ -15,7 +15,8 @@
  *   regions   optional second set of filter chips (e.g. continents), matched against item.region;
  *             regionsLabel is the heading (default "Continents")
  *   items     { q, a, alt?: [accepted alternative answers], ask?, fact?, flag?, group?, region?,
- *               kind? (multiple-choice wrong answers come only from items of the same kind) }
+ *               kind? (multiple-choice wrong answers come only from items of the same kind),
+ *               choices? (fixed wrong answers for multiple choice, used instead of other items) }
  *             q must be unique within a topic: progress is stored against it.
  */
 window.TOPICS = [
@@ -226,6 +227,202 @@ window.TOPICS = [
         fact: "The Pennines run from the Peak District up to the Scottish border." },
       { q: "Range containing Ben Nevis", ask: "Which mountain range in Scotland contains Ben Nevis?", a: "Grampian Mountains", alt: ["Grampians", "Grampian"], kind: "range", region: "europe", group: "uk",
         fact: "The Grampians cover much of the Scottish Highlands." }
+    ]
+  },
+
+  {
+    id: "oceans-continents",
+    title: "Oceans & continents",
+    emoji: "🌍",
+    forward: "{q}?",
+    mcHint: "Pick the right answer from four options",
+    groupsLabel: "Topics to include",
+    groups: {
+      continents: "Continents",
+      countries: "Which continent?",
+      oceans: "Oceans",
+      seas: "Seas",
+      lines: "Lines on the globe"
+    },
+    items: [
+      // Continents
+      { q: "Number of continents", ask: "How many continents are there?", a: "7", alt: ["seven"], choices: ["5", "6", "8"], kind: "number", group: "continents",
+        fact: "The seven continents are Africa, Antarctica, Asia, Europe, North America, Oceania (Australia) and South America." },
+      { q: "Largest continent", ask: "What is the largest continent?", a: "Asia", kind: "continent", group: "continents",
+        fact: "Asia covers about 30% of the world's land." },
+      { q: "Continent with the most people", ask: "Which continent has the most people?", a: "Asia", kind: "continent", group: "continents",
+        fact: "About 6 in every 10 people in the world live in Asia. China and India each have over 1.4 billion people." },
+      { q: "Second largest continent", ask: "What is the second largest continent?", a: "Africa", kind: "continent", group: "continents",
+        fact: "Africa covers about 20% of the world's land." },
+      { q: "Continent with the most countries", ask: "Which continent has the most countries?", a: "Africa", kind: "continent", group: "continents",
+        fact: "Africa has 54 countries." },
+      { q: "Smallest continent", ask: "What is the smallest continent?", a: "Oceania", alt: ["Australia", "Australasia"], kind: "continent", group: "continents",
+        fact: "Oceania is made up of Australia, New Zealand, Papua New Guinea and many Pacific islands. Europe is the second smallest." },
+      { q: "Coldest continent", ask: "Which is the coldest, windiest and driest continent?", a: "Antarctica", kind: "continent", group: "continents",
+        fact: "Antarctica is a cold desert with no permanent population. The lowest temperature ever recorded there was −89.2°C." },
+      { q: "Continent with the Sahara", ask: "Which continent is the Sahara Desert in?", a: "Africa", kind: "continent", group: "continents",
+        fact: "The Sahara is the world's largest hot desert, about the size of the USA." },
+      { q: "Continent with the Amazon rainforest", ask: "Which continent is the Amazon rainforest in?", a: "South America", kind: "continent", group: "continents",
+        fact: "The Amazon is the world's largest tropical rainforest. Most of it is in Brazil." },
+
+      // Which continent is this country in?
+      { q: "Egypt", ask: "Which continent is Egypt in?", a: "Africa", flag: "🇪🇬", kind: "continent", group: "countries" },
+      { q: "Kenya", ask: "Which continent is Kenya in?", a: "Africa", flag: "🇰🇪", kind: "continent", group: "countries" },
+      { q: "Nigeria", ask: "Which continent is Nigeria in?", a: "Africa", flag: "🇳🇬", kind: "continent", group: "countries" },
+      { q: "India", ask: "Which continent is India in?", a: "Asia", flag: "🇮🇳", kind: "continent", group: "countries" },
+      { q: "Japan", ask: "Which continent is Japan in?", a: "Asia", flag: "🇯🇵", kind: "continent", group: "countries" },
+      { q: "Saudi Arabia", ask: "Which continent is Saudi Arabia in?", a: "Asia", flag: "🇸🇦", kind: "continent", group: "countries",
+        fact: "Saudi Arabia is in the Middle East, which is part of Asia." },
+      { q: "Mexico", ask: "Which continent is Mexico in?", a: "North America", flag: "🇲🇽", kind: "continent", group: "countries",
+        fact: "Mexico is in North America, not South America." },
+      { q: "Canada", ask: "Which continent is Canada in?", a: "North America", flag: "🇨🇦", kind: "continent", group: "countries" },
+      { q: "Jamaica", ask: "Which continent is Jamaica in?", a: "North America", flag: "🇯🇲", kind: "continent", group: "countries",
+        fact: "Caribbean islands such as Jamaica count as part of North America." },
+      { q: "Argentina", ask: "Which continent is Argentina in?", a: "South America", flag: "🇦🇷", kind: "continent", group: "countries" },
+      { q: "Peru", ask: "Which continent is Peru in?", a: "South America", flag: "🇵🇪", kind: "continent", group: "countries" },
+      { q: "New Zealand", ask: "Which continent is New Zealand in?", a: "Oceania", alt: ["Australia", "Australasia"], flag: "🇳🇿", kind: "continent", group: "countries" },
+      { q: "Fiji", ask: "Which continent is Fiji in?", a: "Oceania", alt: ["Australia", "Australasia"], flag: "🇫🇯", kind: "continent", group: "countries" },
+      { q: "Iceland", ask: "Which continent is Iceland in?", a: "Europe", flag: "🇮🇸", kind: "continent", group: "countries" },
+
+      // Oceans
+      { q: "Number of oceans", ask: "How many oceans are there?", a: "5", alt: ["five"], choices: ["3", "4", "7"], kind: "number", group: "oceans",
+        fact: "The five oceans are the Pacific, Atlantic, Indian, Southern and Arctic." },
+      { q: "Share of Earth covered by ocean", ask: "Roughly what percentage of the Earth's surface is covered by ocean?", a: "71%", alt: ["71", "70%", "70"], choices: ["31%", "51%", "91%"], kind: "number", group: "oceans",
+        fact: "About 71% of the Earth's surface is ocean." },
+      { q: "Largest ocean", ask: "What is the largest and deepest ocean?", a: "Pacific Ocean", alt: ["Pacific"], kind: "ocean", group: "oceans",
+        fact: "The Pacific is bigger than all the land on Earth put together. Its Mariana Trench is about 11,000 m deep, the deepest point in any ocean." },
+      { q: "Second largest ocean", ask: "What is the second largest ocean?", a: "Atlantic Ocean", alt: ["Atlantic"], kind: "ocean", group: "oceans",
+        fact: "The Atlantic lies between the Americas and Europe and Africa." },
+      { q: "Ocean between the UK and North America", ask: "Which ocean do you cross flying from the UK to the USA?", a: "Atlantic Ocean", alt: ["Atlantic"], kind: "ocean", group: "oceans",
+        fact: "The Titanic sank in the North Atlantic in 1912." },
+      { q: "Ocean south of India", ask: "Which ocean lies between Africa and Australia, south of India?", a: "Indian Ocean", alt: ["Indian"], kind: "ocean", group: "oceans",
+        fact: "The Indian Ocean is the third largest and the warmest ocean." },
+      { q: "Ocean around Antarctica", ask: "Which ocean surrounds Antarctica?", a: "Southern Ocean", alt: ["Southern", "Antarctic Ocean"], kind: "ocean", group: "oceans",
+        fact: "The Southern Ocean is the fourth largest. It was officially recognised as an ocean more recently than the others." },
+      { q: "Smallest ocean", ask: "What is the smallest and shallowest ocean, around the North Pole?", a: "Arctic Ocean", alt: ["Arctic"], kind: "ocean", group: "oceans",
+        fact: "Much of the Arctic Ocean is covered in sea ice, which is shrinking as the climate warms." },
+      { q: "Ocean ringed by volcanoes", ask: "The 'Ring of Fire' of volcanoes and earthquakes surrounds which ocean?", a: "Pacific Ocean", alt: ["Pacific"], kind: "ocean", group: "oceans",
+        fact: "About three-quarters of the world's active volcanoes are on the Ring of Fire." },
+
+      // Seas
+      { q: "Sea between Europe and Africa", ask: "Which sea lies between southern Europe and North Africa?", a: "Mediterranean Sea", alt: ["Mediterranean"], kind: "sea", group: "seas",
+        fact: "The Mediterranean joins the Atlantic at the narrow Strait of Gibraltar." },
+      { q: "Sea between the UK and Norway", ask: "Which sea lies between the east coast of Britain and Norway?", a: "North Sea", kind: "sea", group: "seas",
+        fact: "The North Sea has oil and gas fields and many offshore wind farms." },
+      { q: "Sea between Britain and Ireland", ask: "Which sea lies between Great Britain and Ireland?", a: "Irish Sea", kind: "sea", group: "seas" },
+      { q: "Sea between Africa and Arabia", ask: "Which sea lies between north-east Africa and the Arabian Peninsula?", a: "Red Sea", kind: "sea", group: "seas",
+        fact: "The Suez Canal links the Red Sea to the Mediterranean." },
+      { q: "Sea north of Turkey", ask: "Which sea lies north of Turkey, with Ukraine on its northern coast?", a: "Black Sea", kind: "sea", group: "seas",
+        fact: "The River Danube flows into the Black Sea." },
+      { q: "Largest lake in the world", ask: "Which 'sea' between Europe and Asia is actually the largest lake in the world?", a: "Caspian Sea", alt: ["Caspian"], kind: "sea", group: "seas",
+        fact: "The Caspian Sea is surrounded by land on all sides. The River Volga flows into it." },
+      { q: "Sea with Jamaica and Cuba", ask: "Which sea are Jamaica and Cuba in?", a: "Caribbean Sea", alt: ["Caribbean"], kind: "sea", group: "seas" },
+      { q: "Lowest point on land", ask: "Which salty lake between Israel and Jordan is the lowest point on land?", a: "Dead Sea", kind: "sea", group: "seas",
+        fact: "The shore of the Dead Sea is about 430 m below sea level. It is so salty that people float easily." },
+
+      // Lines on the globe
+      { q: "Line at 0° latitude", ask: "What is the imaginary line at 0° latitude, halfway between the North and South Poles?", a: "Equator", kind: "line", group: "lines",
+        fact: "The Equator splits the Earth into the Northern and Southern Hemispheres." },
+      { q: "Line at 23.5° north", ask: "What is the line of latitude at about 23.5° north?", a: "Tropic of Cancer", kind: "line", group: "lines",
+        fact: "The Tropic of Cancer passes through Mexico, the Sahara, India and China." },
+      { q: "Line at 23.5° south", ask: "What is the line of latitude at about 23.5° south?", a: "Tropic of Capricorn", kind: "line", group: "lines",
+        fact: "The Tropic of Capricorn passes through Brazil, southern Africa and Australia." },
+      { q: "Line at 66.5° north", ask: "What is the line of latitude at about 66.5° north?", a: "Arctic Circle", kind: "line", group: "lines",
+        fact: "North of the Arctic Circle the sun doesn't set on midsummer's day or rise on midwinter's day." },
+      { q: "Line at 66.5° south", ask: "What is the line of latitude at about 66.5° south?", a: "Antarctic Circle", kind: "line", group: "lines" },
+      { q: "Line at 0° longitude", ask: "What is the line of 0° longitude that runs through Greenwich in London?", a: "Prime Meridian", alt: ["Greenwich Meridian", "Meridian"], kind: "line", group: "lines",
+        fact: "Lines of longitude run from pole to pole and measure how far east or west a place is." },
+      { q: "Line at 180° longitude", ask: "Which line, roughly at 180° longitude in the Pacific, marks where the date changes?", a: "International Date Line", alt: ["Date Line"], kind: "line", group: "lines" }
+    ]
+  },
+
+  {
+    id: "climate-types",
+    title: "Climate types",
+    emoji: "🌦️",
+    forward: "{q}?",
+    mcHint: "Pick the right answer from four options",
+    groupsLabel: "Topics to include",
+    groups: {
+      describe: "Name the climate",
+      places: "Climates around the world",
+      factors: "What affects climate",
+      rain: "Types of rainfall",
+      uk: "UK weather & climate"
+    },
+    items: [
+      // Name the climate from its description
+      { q: "Hot and wet all year", ask: "Which climate is hot (about 27°C) and wet all year, with heavy rain most afternoons?", a: "Tropical rainforest", alt: ["Rainforest", "Equatorial", "Tropical"], kind: "climate", group: "describe",
+        fact: "Tropical rainforests are near the Equator. They have the greatest biodiversity of any biome: about half of all species on land." },
+      { q: "Very dry, hot days and cold nights", ask: "Which climate has less than 250 mm of rain a year, very hot days and cold nights?", a: "Hot desert", alt: ["Desert", "Arid"], kind: "climate", group: "describe",
+        fact: "Hot deserts are found around the Tropics of Cancer and Capricorn, where sinking air brings clear skies." },
+      { q: "Wet season and long dry season", ask: "Which climate is hot all year with a wet season and a long dry season, and has grassland with scattered trees?", a: "Savanna", alt: ["Savannah", "Tropical grassland"], kind: "climate", group: "describe",
+        fact: "Savanna is found between the tropical rainforests and the hot deserts, for example in East Africa." },
+      { q: "Hot dry summers, mild wet winters", ask: "Which climate has hot, dry summers and mild, wet winters?", a: "Mediterranean", kind: "climate", group: "describe",
+        fact: "As well as around the Mediterranean Sea, it is found in California, central Chile, South Africa's Cape and south-west Australia." },
+      { q: "Mild with rain all year", ask: "Which climate has mild summers, cool winters and rain spread throughout the year?", a: "Temperate maritime", alt: ["Temperate", "Maritime", "Cool temperate", "Oceanic"], kind: "climate", group: "describe",
+        fact: "'Maritime' means affected by the sea, which keeps temperatures mild all year." },
+      { q: "Hot summers, very cold winters, far from sea", ask: "Which climate has hot summers, very cold winters and little rain because it is far from the sea?", a: "Continental", alt: ["Temperate continental", "Cold continental"], kind: "climate", group: "describe",
+        fact: "Continental climates are found in the middle of large continents, such as central Russia and the Canadian prairies." },
+      { q: "Wet season from changing winds", ask: "Which climate has a very wet season caused by winds changing direction, as in India and Bangladesh?", a: "Monsoon", alt: ["Tropical monsoon"], kind: "climate", group: "describe",
+        fact: "In summer, monsoon winds blow in from the warm ocean, bringing very heavy rain." },
+      { q: "Cold forests of conifers", ask: "Which cold climate has long, freezing winters, short summers and huge coniferous forests?", a: "Taiga", alt: ["Boreal", "Boreal forest", "Coniferous forest"], kind: "climate", group: "describe",
+        fact: "The taiga is the largest land biome. It stretches across Canada, Scandinavia and Russia." },
+      { q: "Frozen ground, no trees", ask: "Which climate has frozen ground (permafrost), a short cool summer and no trees?", a: "Tundra", kind: "climate", group: "describe",
+        fact: "Only mosses, lichens, grasses and small shrubs can grow in the tundra." },
+      { q: "Ice all year", ask: "Which climate is extremely cold all year, with ice sheets and very little precipitation?", a: "Polar", alt: ["Ice cap", "Polar ice cap"], kind: "climate", group: "describe",
+        fact: "Polar climates cover Antarctica and most of Greenland." },
+      { q: "Colder with height", ask: "Which climate gets colder and wetter the higher you go, with snow on the peaks?", a: "Mountain", alt: ["Alpine", "Highland"], kind: "climate", group: "describe",
+        fact: "Even near the Equator, high mountains such as Kilimanjaro have snow on top." },
+
+      // Climates around the world
+      { q: "Amazon and Congo basins", ask: "What climate do the Amazon Basin and the Congo Basin have?", a: "Tropical rainforest", alt: ["Rainforest", "Equatorial", "Tropical"], kind: "climate", group: "places" },
+      { q: "Sahara and Cairo", ask: "What climate do the Sahara and Cairo in Egypt have?", a: "Hot desert", alt: ["Desert", "Arid"], kind: "climate", group: "places" },
+      { q: "Serengeti", ask: "What climate does the Serengeti in Tanzania have?", a: "Savanna", alt: ["Savannah", "Tropical grassland"], kind: "climate", group: "places",
+        fact: "The Serengeti is famous for the yearly migration of wildebeest, following the rains." },
+      { q: "Southern Spain and Greece", ask: "What climate do southern Spain and Greece have?", a: "Mediterranean", kind: "climate", group: "places" },
+      { q: "The UK", ask: "What type of climate does the UK have?", a: "Temperate maritime", alt: ["Temperate", "Maritime", "Cool temperate", "Oceanic"], kind: "climate", group: "places" },
+      { q: "Mumbai", ask: "What climate does Mumbai in India have?", a: "Monsoon", alt: ["Tropical monsoon"], kind: "climate", group: "places" },
+      { q: "Siberia and northern Canada's forests", ask: "What climate do the forests of Siberia and northern Canada have?", a: "Taiga", alt: ["Boreal", "Boreal forest", "Coniferous forest"], kind: "climate", group: "places" },
+      { q: "Northern Alaska", ask: "What climate does northern Alaska, near the Arctic Ocean, have?", a: "Tundra", kind: "climate", group: "places" },
+      { q: "Antarctica", ask: "What climate does Antarctica have?", a: "Polar", alt: ["Ice cap", "Polar ice cap"], kind: "climate", group: "places" },
+      { q: "Biome with most species", ask: "Which biome has the greatest biodiversity (the most kinds of plants and animals)?", a: "Tropical rainforest", alt: ["Rainforest"], kind: "climate", group: "places" },
+
+      // What affects climate
+      { q: "Colder away from the Equator", ask: "Places get colder the further they are from the Equator. Which factor is this?", a: "Latitude", kind: "factor", group: "factors",
+        fact: "Near the Equator the sun's rays are concentrated on a small area. Near the poles the same energy is spread over a bigger area." },
+      { q: "Colder the higher you go", ask: "Temperature falls by about 6.5°C for every 1,000 m you climb. Which factor is this?", a: "Altitude", alt: ["Height", "Elevation", "Relief"], kind: "factor", group: "factors" },
+      { q: "Milder near the coast", ask: "Coastal places have milder winters and cooler summers than places inland. Which factor is this?", a: "Distance from the sea", alt: ["Distance from sea", "Continentality"], kind: "factor", group: "factors",
+        fact: "The sea heats up and cools down more slowly than the land." },
+      { q: "Warm water moving around the world", ask: "Warm or cold water moving around the oceans changes the temperature of nearby land. Which factor is this?", a: "Ocean currents", alt: ["Currents", "Ocean current"], kind: "factor", group: "factors" },
+      { q: "Usual direction of the wind", ask: "What do we call the direction the wind blows from most often?", a: "Prevailing wind", alt: ["Prevailing winds"], kind: "factor", group: "factors",
+        fact: "In the UK, the prevailing wind is from the south-west." },
+
+      // Types of rainfall
+      { q: "Rain over mountains", ask: "What type of rainfall forms when moist air is forced to rise over mountains?", a: "Relief rainfall", alt: ["Relief", "Orographic rainfall", "Orographic"], kind: "rain", group: "rain",
+        fact: "This is why the mountains of western Britain are so wet." },
+      { q: "Rain from the sun heating the ground", ask: "What type of rainfall forms when the sun heats the ground and warm air rises quickly, common in the tropics?", a: "Convectional rainfall", alt: ["Convectional", "Convection rainfall"], kind: "rain", group: "rain",
+        fact: "It often brings afternoon thunderstorms in tropical rainforests." },
+      { q: "Rain where warm air meets cold air", ask: "What type of rainfall forms when warm air meets cold air and is forced to rise over it?", a: "Frontal rainfall", alt: ["Frontal", "Cyclonic rainfall"], kind: "rain", group: "rain",
+        fact: "Most of the UK's rain is frontal rainfall, brought by depressions from the Atlantic." },
+      { q: "Dry side of a mountain", ask: "What is the drier area on the sheltered side of mountains called?", a: "Rain shadow", kind: "rain", group: "rain",
+        fact: "The air loses most of its moisture as it rises over the mountains, then warms as it sinks down the other side." },
+
+      // UK weather & climate
+      { q: "Climate versus weather", ask: "Climate is the average weather over roughly how many years?", a: "30", alt: ["30 years", "thirty"], choices: ["1", "5", "100"], kind: "number", group: "uk",
+        fact: "Weather is the day-to-day state of the atmosphere. Climate is the average pattern over about 30 years." },
+      { q: "UK prevailing wind", ask: "Which direction does the UK's prevailing wind come from?", a: "South-west", alt: ["Southwest", "SW"], choices: ["North-east", "South-east", "North-west"], kind: "direction", group: "uk",
+        fact: "South-westerly winds bring mild, moist air from the Atlantic." },
+      { q: "Wettest side of the UK", ask: "Which side of the UK gets the most rain?", a: "West", alt: ["The west"], choices: ["East", "North", "South"], kind: "direction", group: "uk",
+        fact: "Moist air from the Atlantic rises over the western mountains (relief rainfall). The east is in a rain shadow." },
+      { q: "Warmest part of the UK in summer", ask: "Which part of the UK is usually warmest in summer?", a: "South-east", alt: ["Southeast", "SE"], choices: ["North-west", "North-east", "South-west"], kind: "direction", group: "uk",
+        fact: "The south-east is furthest south (latitude) and closest to mainland Europe, which heats up in summer." },
+      { q: "Current keeping the UK mild", ask: "Which warm ocean current keeps the UK's winters mild?", a: "North Atlantic Drift", alt: ["Gulf Stream"], choices: ["Labrador Current", "Canary Current", "Humboldt Current"], kind: "current", group: "uk",
+        fact: "The North Atlantic Drift carries warm water from the Gulf of Mexico. Without it, UK winters would be much colder." },
+      { q: "High pressure weather", ask: "What is an area of high pressure, bringing dry and settled weather, called?", a: "Anticyclone", choices: ["Depression", "Front", "Monsoon"], kind: "pressure", group: "uk",
+        fact: "Anticyclones bring hot sunny days in summer, and cold, frosty or foggy weather in winter." },
+      { q: "Low pressure weather", ask: "What is an area of low pressure, bringing wind, cloud and rain, called?", a: "Depression", alt: ["Low", "Cyclone"], choices: ["Anticyclone", "Front", "Jet stream"], kind: "pressure", group: "uk",
+        fact: "Depressions come in from the Atlantic and bring most of the UK's rain." }
     ]
   }
 ];

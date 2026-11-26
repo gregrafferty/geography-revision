@@ -62,7 +62,7 @@
     return a;
   };
   // Ignore accents, case, punctuation and filler words, so "the River Thames" matches "Thames".
-  const FILLER = new Set(["the", "river", "mount", "mt", "mountain", "mountains"]);
+  const FILLER = new Set(["the", "river", "mount", "mt", "mountain", "mountains", "sea", "ocean"]);
   const normalise = (s) => String(s).normalize("NFD").replace(/[̀-ͯ]/g, "")
     .toLowerCase().replace(/[^a-z0-9\s]/g, " ").split(/\s+/).filter(w => w && !FILLER.has(w)).join("");
 
@@ -87,7 +87,7 @@
     if (targets.includes(n)) return "exact";
     const best = Math.min(...targets.map(t => levenshtein(n, t)));
     const longest = Math.max(...targets.map(t => t.length));
-    if (best <= (longest > 6 ? 2 : 1)) return "close";
+    if (best <= (longest > 6 ? 2 : longest > 4 ? 1 : 0)) return "close";
     return "wrong";
   }
 
@@ -298,8 +298,9 @@
       const sameGroup = shuffle(candidates.filter(i => i.group === item.group && pool.includes(i)));
       const others = shuffle(candidates.filter(i => !sameGroup.includes(i)));
       const seen = new Set([correctAnswer]);
-      const distractors = [];
-      for (const c of [...sameGroup, ...others]) {
+      // An item can list its own wrong answers (useful for numbers, directions and one-off terms).
+      const distractors = item.choices && !reverse ? shuffle(item.choices).slice(0, 3) : [];
+      if (!distractors.length) for (const c of [...sameGroup, ...others]) {
         const ans = answerOf(c);
         if (!seen.has(ans)) { seen.add(ans); distractors.push(ans); }
         if (distractors.length === 3) break;

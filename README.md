@@ -3,7 +3,9 @@
 A small, installable web app (PWA) for revising geography for a mock exam. Topics so far:
 
 - **European capital cities**
-- **World rivers & mountains**: the longest rivers, which rivers flow through which cities, the major mountain ranges, the highest peak on each continent, and UK rivers and mountains
+- **World rivers & mountains**: the longest rivers, which rivers flow through which cities, the major mountain ranges, the highest peak on each continent, and UK rivers and mountains, with a filter by continent
+- **Oceans & continents**: continent facts, which continent a country is in, the five oceans, major seas, and lines on the globe (Equator, Tropics, Prime Meridian)
+- **Climate types**: naming climates from their description, where each climate is found, what affects climate, types of rainfall, and UK weather and climate
 
  It has no build step and no dependencies, and it works offline once it has loaded.
 
